@@ -8,10 +8,14 @@ class DatabaseController:
     connCursor = None
     aes = None
 
+    systemPassword = None
+
     def __init__(self, dbPath, systemPassword):
         self.conn = sqlite3.connect(dbPath)
         self.connCursor = self.conn.cursor()
-        self.aes = AESController(systemPassword)
+        self.aes = AESController()
+
+        self.systemPassword = systemPassword
 
         #Create table if not exist
         sql = 'CREATE TABLE IF NOT EXISTS identities (id INTEGER PRIMARY KEY, data text)'
@@ -21,7 +25,7 @@ class DatabaseController:
 
     def createIdentity(self, data):
         
-        self.connCursor.execute('''INSERT INTO identities (data) values (?)''', [(self.aes.encrypt(data))])
+        self.connCursor.execute('''INSERT INTO identities (data) values (?)''', [(data)])
         self.conn.commit()
         return
 

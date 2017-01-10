@@ -20,12 +20,6 @@ class AESController:
 	# the size multiple required for AES
 	AES_MULTIPLE = 16
 
-	password = None
-
-	def __init__(self, systemPassword):
-		password = systemPassword
-
-
 	def generate_key(self, password, salt, iterations):
 	    assert iterations > 0
 
@@ -54,10 +48,10 @@ class AESController:
 
 	    return text
 
-	def encrypt(self, plaintext):
+	def encrypt(self, plaintext, password):
 	    salt = Crypto.Random.get_random_bytes(self.SALT_SIZE)
 
-	    key = self.generate_key(self.password, salt, self.NUMBER_OF_ITERATIONS)
+	    key = self.generate_key(password, salt, self.NUMBER_OF_ITERATIONS)
 
 	    cipher = AES.new(key, AES.MODE_ECB)
 
@@ -72,12 +66,12 @@ class AESController:
 
 	    return ciphertext_with_salt
 
-	def decrypt(self, ciphertext):
+	def decrypt(self, ciphertext, password):
 	    salt = ciphertext[0:self.SALT_SIZE]
 
 	    ciphertext_sans_salt = ciphertext[self.SALT_SIZE:]
 
-	    key = self.generate_key(self.password, salt, self.NUMBER_OF_ITERATIONS)
+	    key = self.generate_key(password, salt, self.NUMBER_OF_ITERATIONS)
 
 	    cipher = AES.new(key, AES.MODE_ECB)
 
