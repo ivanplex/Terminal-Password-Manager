@@ -1,0 +1,4 @@
+*.pyc
+*.db
+__pwd__
+test.py
