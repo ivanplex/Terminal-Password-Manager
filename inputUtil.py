@@ -1,4 +1,5 @@
-import sys
+import sys, tempfile, os
+from subprocess import call
 
 def query_yes_no(question, default="None"):
     """Ask a yes/no question via raw_input() and return their answer.

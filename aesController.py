@@ -60,9 +60,6 @@ class AESController:
 	    ciphertext = cipher.encrypt(padded_plaintext)
 
 	    ciphertext_with_salt = salt + ciphertext
-	    print salt
-	    print ciphertext
-	    print ciphertext_with_salt
 
 	    return ciphertext_with_salt
 
@@ -94,5 +91,6 @@ c = AESController()
 
 
 ciperT = c.encrypt(json.dumps(data), 'qwerty')
+print ciperT
 print c.decrypt(ciperT, 'qwerty')
 '''

@@ -12,6 +12,7 @@ class DatabaseController:
 
     def __init__(self, dbPath, systemPassword):
         self.conn = sqlite3.connect(dbPath)
+        self.conn.text_factory = str
         self.connCursor = self.conn.cursor()
         self.aes = AESController()
 
@@ -25,21 +26,33 @@ class DatabaseController:
 
     def createIdentity(self, data):
         
-        self.connCursor.execute('''INSERT INTO identities (data) values (?)''', [(data)])
+        self.connCursor.execute('''INSERT INTO identities (data) values (?)''', [(self.aes.encrypt(data, self.systemPassword))])
         self.conn.commit()
         return
 
     def fetchAll(self):
         self.connCursor.execute('''SELECT id,data FROM identities''')
-        return self.connCursor.fetchall()
+        #return self.connCursor.fetchall()
+        results = self.connCursor.fetchall()
+
+        returnArray = {}
+        for ID, encryptedData in results:
+            returnArray[ID] = self.aes.decrypt(encryptedData, self.systemPassword)
+
+        return returnArray
     
     def readData(self, ID):
 
         self.connCursor.execute('''SELECT data FROM identities WHERE id = ? ORDER BY ROWID ASC LIMIT 1''', [(ID)])
-        return self.connCursor.fetchone()
+        #print self.connCursor.fetchone()
+        result = self.connCursor.fetchone()
+        if result is None:
+            return None
+        else:
+            return self.aes.decrypt(result[0], self.systemPassword)
 
     def modifyIdentity(self, ID, data):
-        self.connCursor.executemany('''UPDATE identities SET data = ? WHERE id = ?''', [(data, ID)])
+        self.connCursor.executemany('''UPDATE identities SET data = ? WHERE id = ?''', [(self.aes.encrypt(data, self.systemPassword), ID)])
         self.conn.commit()
         return
 
@@ -49,4 +62,10 @@ class DatabaseController:
         self.conn.commit()
         return
 
-
+'''
+d = DatabaseController('data.db', 'vanderhook5002')
+entires = d.fetchAll()
+for ID, data in entires.iteritems():
+    print ID
+    print data
+'''

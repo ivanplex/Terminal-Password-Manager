@@ -1,5 +1,5 @@
 import json, re, tempfile, os, sys, getpass
-from subprocess import call
+
 
 from identityController import IdentityController
 from identityController import NoSuchIdentityException, PropertyAlreadyExistException, PropertyDoesNotExistException
@@ -54,7 +54,6 @@ class View:
 
     def searchIdentity(self, query):
         identities = self.identityController.listSimilar(query)
-        print identities
 
         if(len(identities) == 1):
             #Print details of identity
@@ -63,7 +62,7 @@ class View:
                 identityID = key
 
             print ""
-            viewPropertiesByID(identityID)
+            self.viewPropertiesByID(identityID)
         else:
             #print all similar identities
             for key, value in identities.iteritems():

@@ -17,10 +17,8 @@ class IdentityController:
 
         #Check if Identity already exist
         entires = self.databaseController.fetchAll()
-        for entry in entires:
-            jsonData = entry[1]
+        for ID, jsonData in entires.iteritems():
             data = json.loads(jsonData)
-
             if (data['name'] == name):
                 raise IdentityAlreadyExistException()
                 return
@@ -38,8 +36,8 @@ class IdentityController:
         Fetch Identity by ID
         """
         sqlJsonData = self.databaseController.readData(ID)
-        if(sqlJsonData != None):          #Check if Identity exist
-            return sqlJsonData[0]
+        if(sqlJsonData is not None):          #Check if Identity exist
+            return sqlJsonData
         else:
             raise NoSuchIdentityException()
         return
@@ -47,27 +45,26 @@ class IdentityController:
     def fetchAllIdentities(self):
         """
         List all Identities
-        """
-        entires = self.databaseController.fetchAll()
 
-        results = {}
-        for entry in entires:
-            jsonData = entry[1]
+        return <key> <identity-name> pair
+        """
+        result = {}
+        entires = self.databaseController.fetchAll()
+        for ID, jsonData in entires.iteritems():
             data = json.loads(jsonData)
-            results[entry[0]] = data['name']
-            #print data['name'] + " [" + str(entry[0]) + "]"
-        return results
+            result[ID] = data['name']
+
+        return result
 
     def fetchIdentityIDByName(self, name):
         """
         Fetch identity ID by identity name
         """
         entires = self.databaseController.fetchAll()
-        for entry in entires:
-            jsonData = entry[1]
+        for ID, jsonData in entires.iteritems():
             data = json.loads(jsonData)
             if data['name'] == name:
-                return entry[0] #return ID
+                return ID #return ID
 
         return None    #If no identity is found by name
 
@@ -80,12 +77,11 @@ class IdentityController:
         entires = self.databaseController.fetchAll()
 
         results = {}
-        for entry in entires:
-            jsonData = entry[1]
+        for ID, jsonData in entires.iteritems():
             data = json.loads(jsonData)
             if regexp.search(data['name'].lower()) is not None:
-                results[entry[0]] = data['name']
-                #print data['name'] + " [" + str(entry[0]) + "]"
+                results[ID] = data['name']
+
         return results
 
     def removeIdentity(self, name):
@@ -93,11 +89,10 @@ class IdentityController:
         Remove identity given name
         """
         entires = self.databaseController.fetchAll()
-        for entry in entires:
-            jsonData = entry[1]
+        for ID, jsonData in entires.iteritems():
             data = json.loads(jsonData)
             if data['name'] == name:
-                self.databaseController.removeIdentity(entry[0]) 
+                self.databaseController.removeIdentity(ID) 
                 return
 
         raise NoSuchIdentityException()
