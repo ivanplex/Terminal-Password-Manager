@@ -78,19 +78,3 @@ class AESController:
 
 	    return plaintext
 
-'''
-data = {}
-
-data['asd'] = 'haha'
-data['nono'] = 'hmm'
-another = {}
-another['tt'] = 'car'
-data['hoho'] = another
-
-c = AESController()
-
-
-ciperT = c.encrypt(json.dumps(data), 'qwerty')
-print ciperT
-print c.decrypt(ciperT, 'qwerty')
-'''

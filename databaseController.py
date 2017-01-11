@@ -61,11 +61,3 @@ class DatabaseController:
         self.connCursor.execute('''DELETE FROM identities WHERE id = ?''', [(ID)])
         self.conn.commit()
         return
-
-'''
-d = DatabaseController('data.db', 'vanderhook5002')
-entires = d.fetchAll()
-for ID, data in entires.iteritems():
-    print ID
-    print data
-'''
