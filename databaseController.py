@@ -1,4 +1,6 @@
 import sqlite3
+from time import gmtime, strftime
+
 from aesController import AESController
 
 
@@ -19,14 +21,14 @@ class DatabaseController:
         self.systemPassword = systemPassword
 
         #Create table if not exist
-        sql = 'CREATE TABLE IF NOT EXISTS identities (id INTEGER PRIMARY KEY, data text)'
+        sql = 'CREATE TABLE IF NOT EXISTS identities (id INTEGER PRIMARY KEY, data text, updated_at text)'
         self.connCursor.execute(sql)
         self.conn.commit()
         return
 
     def createIdentity(self, data):
         
-        self.connCursor.execute('''INSERT INTO identities (data) values (?)''', [(self.aes.encrypt(data, self.systemPassword))])
+        self.connCursor.executemany('''INSERT INTO identities (data, updated_at) values (?,?)''', [(self.aes.encrypt(data, self.systemPassword), strftime("%Y-%m-%d %H:%M:%S", gmtime()))])
         self.conn.commit()
         return
 
@@ -52,7 +54,7 @@ class DatabaseController:
             return self.aes.decrypt(result[0], self.systemPassword)
 
     def modifyIdentity(self, ID, data):
-        self.connCursor.executemany('''UPDATE identities SET data = ? WHERE id = ?''', [(self.aes.encrypt(data, self.systemPassword), ID)])
+        self.connCursor.executemany('''UPDATE identities SET data = ?, updated_at = ? WHERE id = ?''', [(self.aes.encrypt(data, self.systemPassword), strftime("%Y-%m-%d %H:%M:%S", gmtime()), ID)])
         self.conn.commit()
         return
 

@@ -2,7 +2,7 @@ import json, re, tempfile, os, sys, getpass
 
 
 from identityController import IdentityController
-from identityController import NoSuchIdentityException, PropertyAlreadyExistException, PropertyDoesNotExistException
+from identityController import NoSuchIdentityException, PropertyAlreadyExistException, PropertyDoesNotExistException, IdentityAlreadyExistException
 from inputUtil import query_yes_no, callEditor
 
 class View:
@@ -24,7 +24,11 @@ class View:
         print "Class: ",
         classification = raw_input()
 
-        self.identityController.createIdentity(name, classification, password)
+        try:
+            self.identityController.createIdentity(name, classification, password)
+        except IdentityAlreadyExistException:
+            print "Error: Identity Alread Exist!\n"
+            return
 
         print "Identity: "+name+" created successfully."
         return
