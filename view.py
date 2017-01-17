@@ -65,12 +65,13 @@ class View:
             for key, value in identities.iteritems():
                 identityID = key
 
-            print ""
-            self.viewPropertiesByID(identityID)
+            return identityID
         else:
             #print all similar identities
+            print "No matching identity found, here are some similar results:"
             for key, value in identities.iteritems():
                 print value+": ["+str(key)+"]"
+            return None
 
     def getIdentityName(self, ID):
         jsonData = self.identityController.fetchIdentityByID(ID)

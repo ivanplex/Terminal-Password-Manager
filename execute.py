@@ -88,7 +88,6 @@ def internalConsoleHelper():
 	return
 
 
-
 def run():
 
 	global identityID 
@@ -100,13 +99,23 @@ def run():
 		if identityID is not None:
 			print view.getIdentityName(identityID)+" >",
 
-		action = raw_input().split()
+		rawInput = raw_input().split()
+		if len(rawInput) > 1:
+			action = rawInput[0]
+			actionParameter = ' '.join(rawInput[1:])
+		elif len(rawInput) == 1:
+			action = rawInput[0]
+			actionParameter = None
+		else:
+			action = None
+			actionParameter = None
 
-		if len(action) == 0:		#If nothing entered
+
+		if action is None:		#If nothing entered
 			continue
-		elif action[0] == "exit":
+		elif action == "exit":
 			sys.exit()
-		elif action[0] == "help":
+		elif action == "help":
 			internalConsoleHelper()
 			continue
 		else:
@@ -114,37 +123,41 @@ def run():
 				'''
 				If querying for Identity
 				'''
-				if action[0] == "list":
+				if action == "list":
 					view.viewAllIdentities()
 					continue
-				elif action[0] == "find":
-					if(len(action) == 2):
-						view.searchIdentity(action[1])
+				elif action == "find":
+					if actionParameter is not None:
+						result = view.searchIdentity(actionParameter)
+						if(result is not None):
+							view.viewPropertiesByID(result)
 						continue
 					else:
 						print "Invalid search: find <name>"
 						continue
-				elif action[0] == "create":
-					if(len(action) == 2):
-						view.createIdentity(action[1])
+				elif action == "create":
+					if actionParameter is not None:
+						view.createIdentity(actionParameter)
 						continue
 					else:
 						print "Invalid systax"
 						print "Usage: create <identity-name>"
 						continue
 
-				elif action[0] == "remove":
-					if(len(action) == 2):
-						view.removeIdentity(action[1])
+				elif action == "remove":
+					if actionParameter is not None:
+						view.removeIdentity(actionParameter)
 						continue
 					else:
 						print "Invalid systax"
 						print "Usage: remove <identity-name>"
 						continue
 
-				elif action[0] == "enter":
-					if(len(action) == 2):
-						identityID = view.getIdentityIDFromInput(action[1])
+				elif action == "enter":
+					if actionParameter is not None:
+						result = view.getIdentityIDFromInput(actionParameter)
+						if(result is not None):
+							identityID = result
 						continue
 					else:
 						print "Invalid syntax"
@@ -154,15 +167,15 @@ def run():
 				'''
 				If querying for property
 				'''
-				if action[0] == "list":
+				if action == "list":
 					view.viewPropertiesByID(identityID)
 					continue
-				elif action[0] == "back":
+				elif action == "back":
 					identityID = None
 					continue
-				elif action[0] == "set":
-					if(len(action) == 2):
-						view.setProperty(identityID, action[1])
+				elif action == "set":
+					if actionParameter is not None:
+						view.setProperty(identityID, actionParameter)
 						continue
 					else:
 						print "Invalid syntax"
@@ -170,9 +183,9 @@ def run():
 						print "set <property-name>"
 						print "Your value will be recorded in the Vim editor"
 						continue
-				elif action[0] == "remove":
-					if(len(action) == 2):
-						identityController.removeProperty(identityID, action[1])
+				elif action == "remove":
+					if actionParameter is not None:
+						identityController.removeProperty(identityID, actionParameter)
 						continue
 					else:
 						print "Invalid syntax"
