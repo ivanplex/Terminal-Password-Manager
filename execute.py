@@ -2,7 +2,7 @@
 
 import sys, getopt, getpass, hashlib
 
-from identityController import NoSuchIdentityException, PropertyAlreadyExistException, PropertyDoesNotExistException
+from identityController import NoSuchIdentityException, PropertyAlreadyExistException, PropertyDoesNotExistException, NoMatchingIdentityException
 from view import View
 from identityController import IdentityController
 from auth import Auth
@@ -59,7 +59,7 @@ def main(argv):
 				view.viewAllIdentities()
 				sys.exit()
 			elif opt in ("-a", "--account"):
-				view.searchIdentity(arg)
+				identityController.searchIdentity(arg)
 				sys.exit()
 			elif opt in ("-i", "--id"):
 				view.viewPropertiesByID(arg);
@@ -80,10 +80,21 @@ def internalConsoleHelper():
 	"""
 	Help information for internal functions
 	"""
-	print "At anytime:"
-	print "\"help\" to trigger help information"
-	print "\"exit\" to exit from Password Manager console\n" 
-	print "While inside of Password Manager console:"
+	print "At anytime:\n"
+	print "   \"help\" to trigger help information\n"
+	print "   \"exit\" to exit from Password Manager console\n" 
+
+	print "While inside of Password Manager console:\n"
+	print "   \"list\" to view all identities with their ID\n"
+	print "   \"find <query>\" to find identity with name similar to <query>\n"
+	print "   \"enter <identity-name>\" to enter Identity, or similarly,"
+	print "   \"enter <identity-ID>\"\n"
+	print "   \"create <new-identity-name>\" to create new identity\n"
+	print "   \"remove <existing-identity-name>\" to remove identity\n"
+
+	print "While inside of Identity:\n"
+	print "   \"list\" to view all identity's information\n"
+
 
 	return
 
@@ -128,10 +139,14 @@ def run():
 					continue
 				elif action == "find":
 					if actionParameter is not None:
-						result = view.searchIdentity(actionParameter)
-						if(result is not None):
+						try:
+							result = identityController.searchIdentity(actionParameter)
 							view.viewPropertiesByID(result)
-						continue
+							continue
+						except NoMatchingIdentityException, e:
+							print "No matching identity found, here are some similar results:"
+							view.viewSetOfIdentities(e.similarResults)
+							continue
 					else:
 						print "Invalid search: find <name>"
 						continue
@@ -155,10 +170,14 @@ def run():
 
 				elif action == "enter":
 					if actionParameter is not None:
-						result = view.getIdentityIDFromInput(actionParameter)
-						if(result is not None):
+						try:
+							result = view.getIdentityIDFromInput(actionParameter)
 							identityID = result
-						continue
+							continue
+						except NoMatchingIdentityException, e:
+							print "No matching identity found, here are some similar results:"
+							view.viewSetOfIdentities(e.similarResults)
+							continue
 					else:
 						print "Invalid syntax"
 						print "Usage: enter <identity-ID> or enter <identity-name>"

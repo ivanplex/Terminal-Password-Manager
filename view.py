@@ -2,7 +2,7 @@ import json, re, tempfile, os, sys, getpass
 
 
 from identityController import IdentityController
-from identityController import NoSuchIdentityException, PropertyAlreadyExistException, PropertyDoesNotExistException, IdentityAlreadyExistException
+from identityController import NoSuchIdentityException, PropertyAlreadyExistException, PropertyDoesNotExistException, IdentityAlreadyExistException, NoMatchingIdentityException
 from inputUtil import query_yes_no, callEditor
 
 class View:
@@ -56,22 +56,17 @@ class View:
         for key, value in identities.iteritems():
             print value+": ["+str(key)+"]"
 
-    def searchIdentity(self, query):
-        identities = self.identityController.listSimilar(query)
+    def viewSetOfIdentities(self, identities):
+        """
+        Print the given list of identities
 
-        if(len(identities) == 1):
-            #Print details of identity
-            identityID = None
-            for key, value in identities.iteritems():
-                identityID = key
+        Args:
+            dictionaries: List of Identities in the following format
+                        Identity ID <int> : Identity Name<string>
+        """
+        for key, value in identities.iteritems():
+            print value+": ["+str(key)+"]"
 
-            return identityID
-        else:
-            #print all similar identities
-            print "No matching identity found, here are some similar results:"
-            for key, value in identities.iteritems():
-                print value+": ["+str(key)+"]"
-            return None
 
     def getIdentityName(self, ID):
         jsonData = self.identityController.fetchIdentityByID(ID)
@@ -91,16 +86,19 @@ class View:
         return identity-ID
         """
         try:
-            ID = self.identityController.fetchIdentityIDByName(input)
-            if ID is not None:
-                #ID found by name!
+            try:
+
+                ID = self.identityController.searchIdentity(input)
                 return ID
-            else:
+
+            except NoMatchingIdentityException, e:
+
                 self.getIdentityName(input) #Check if ID exist by testing if getIdentityName returns valid output
                 return input
 
         except NoSuchIdentityException:
-            print "No such identity name/ID"
+            print "No matching identity found, here are some similar results:"
+            self.viewSetOfIdentities(e.similarResults)
 
         return None     #Return None if no result is found by name/ID
 

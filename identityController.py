@@ -84,6 +84,43 @@ class IdentityController:
 
         return results
 
+    def searchIdentity(self, query):
+        """
+        Search for Identity using identity name.
+
+        If only one identity is found, the Identity's ID will be returned.
+        If more than one identities are found, a list of similar identities
+        will be printed.
+
+        Args:
+            query (string): Identity name queried by user
+
+        Returns:
+            int: One identity is found and return the identity's ID
+            dictionaries: More than one or no identity is found. 
+                    - Identity ID <int> : Identity Name<string>
+                    - An empty dictionary could be return if no result is found
+
+        """
+        identities = self.listSimilar(query)
+
+        if(len(identities) == 1):
+            #Print details of identity
+            identityID = None
+            for key, value in identities.iteritems():
+                identityID = key
+
+            return identityID
+        else:
+            #print all similar identities
+            '''
+            print "No matching identity found, here are some similar results:"
+            for key, value in identities.iteritems():
+                print value+": ["+str(key)+"]"
+            '''
+            raise NoMatchingIdentityException(identities)
+            return None
+
     def removeIdentity(self, name):
         """
         Remove identity given name
@@ -198,6 +235,18 @@ class IdentityController:
                 return False
         return
 
+
+class NoMatchingIdentityException(Exception):
+    """
+    No matching Identity was found
+    This could be triggered by an ambiguous search term
+
+    Attributes:
+        similarResults: A dictionary of simiar results
+                    - Identity ID <int> : Identity Name<string>
+    """
+    def __init__(self, similarResults):
+        self.similarResults = similarResults
 
 class IdentityAlreadyExistException(Exception):
     pass
